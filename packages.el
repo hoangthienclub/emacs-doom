@@ -47,10 +47,4 @@
 ;; ...Or *all* packages (NOT RECOMMENDED; will likely break things)
 ;(unpin! t)
 
-(package! rjsx-mode)
-(package! typescript-mode)
-(package! web-mode)
-(package! tide)
-(package! company)
-(package! yasnippet)
-(package! rjsx-mode)
+;(package! rjsx-mode)
