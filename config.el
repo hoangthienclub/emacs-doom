@@ -142,16 +142,203 @@
 (map!
 	  :nv    "-"     #'evil-window-decrease-width
 		:nv    "+"     #'evil-window-increase-width
-	;; prettier-js
+;; prettier-js
 		"C-c f f"      #'prettier-js
 		"C-c f l"      #'flycheck-list-errors
-;evil:
-		"C-h"					#'evil-window-left
-		"C-l"					#'evil-window-right
-		"C-j"					#'evil-window-down
-		"C-k"					#'evil-window-up
-
+;;evil:
 		"C-S-v"				#'evil-window-vsplit
 		"C-S-h"				#'evil-window-split
 )
 
+(use-package! lsp-mode
+  :commands lsp
+  :config
+  (setq lsp-idle-delay 0.2
+        lsp-enable-file-watchers nil
+        lsp-prefer-capf t
+        lsp-eldoc-render-all t
+        )
+  (add-hook 'lsp-mode-hook 'lsp-ui-mode)
+
+  :custom
+  ;; what to use when checking on-save. "check" is default, I prefer clippy
+  (lsp-rust-analyzer-cargo-watch-command "clippy")
+  (lsp-rust-analyzer-server-display-inlay-hints t)
+  (lsp-rust-analyzer-display-lifetime-elision-hints-enable "skip_trivial")
+  (lsp-rust-analyzer-display-chaining-hints t)
+  (lsp-rust-analyzer-display-lifetime-elision-hints-use-parameter-names nil)
+  (lsp-rust-analyzer-display-closure-return-type-hints t)
+  (lsp-rust-analyzer-display-parameter-hints nil)
+  (lsp-rust-analyzer-display-reborrow-hints nil)
+
+  (add-to-list 'lsp-language-id-configuration '(js-jsx-mode . "javascriptreact"))
+  )
+
+(use-package! lsp-ui
+  :commands lsp-ui-mode
+  :hook (lsp-mode . lsp-ui-mode)
+  :config
+  (setq lsp-headerline-breadcrumb-enable t ;
+        lsp-lens-enable t                  ;
+        )
+  :bind (:map lsp-ui-mode-map
+         ([remap xref-find-definitions] . lsp-ui-peek-find-definitions)
+         ([remap xref-find-references] . lsp-ui-peek-find-references)
+         ([remap xref-pop-marker-stack] . lsp-ui-peek-jump-backward)
+         )
+  :custom
+  (lsp-ui-doc-position 'bottom)
+  (lsp-ui-peek-always-show t)
+  (lsp-ui-sideline-show-hover t)
+  (lsp-ui-doc-enable nil)
+  )
+
+(after! company
+  (setq company-idle-delay 0.2
+        company-minimum-prefix-length 2)
+  (add-hook 'evil-normal-state-entry-hook #'company-abort)) ;; make aborting less annoying.
+
+(use-package engine-mode
+  :config
+  (engine/set-keymap-prefix (kbd "C-c s"))
+  (setq browse-url-browser-function 'browse-url-default-macosx-browser
+        engine/browser-function 'browse-url-default-macosx-browser
+        ;; browse-url-generic-program "google-chrome"
+        )
+
+  (defengine stack-overflow
+    "https://stackoverflow.com/search?q=%s"
+    :keybinding "o")
+
+  (defengine translate
+    "https://translate.google.com/?sl=en&tl=vi&text=%s&op=translate"
+    :keybinding "t")
+
+  (defengine youtube
+    "http://www.youtube.com/results?aq=f&oq=&search_query=%s"
+    :keybinding "y")
+
+  (defengine google
+    "http://www.google.com/search?ie=utf-8&oe=utf-8&q=%s"
+    :keybinding "g")
+
+  (engine-mode 1))
+
+
+(defun dqv/use-eslint-from-node-modules ()
+    "Set local eslint if available."
+    (let* ((root (locate-dominating-file
+                  (or (buffer-file-name) default-directory)
+                  "node_modules"))
+           (eslint (and root
+                        (expand-file-name "node_modules/eslint/bin/eslint.js"
+                                          root))))
+      (when (and eslint (file-executable-p eslint))
+        (setq-local flycheck-javascript-eslint-executable eslint))))
+(use-package! flycheck
+    :config
+    (add-hook 'after-init-hook 'global-flycheck-mode)
+    (add-hook 'flycheck-mode-hook 'dqv/use-eslint-from-node-modules))
+
+
+(setq
+    css-indent-offset 2
+    js2-basic-offset 2
+    js-switch-indent-offset 2
+    js-indent-level 2
+    js-jsx-indent-level 2
+    js2-mode-show-parse-errors nil
+    js2-mode-show-strict-warnings nil
+    web-mode-attr-indent-offset 2
+    web-mode-code-indent-offset 2
+    web-mode-css-indent-offset 2
+    web-mode-markup-indent-offset 2
+    web-mode-enable-current-element-highlight t
+    web-mode-enable-current-column-highlight t)
+
+  
+(use-package! js-mode
+  :ensure t
+  :mode "\\.js\\'")
+(add-to-list 'auto-mode-alist '("\\.js\\'" . web-mode))
+(add-to-list 'auto-mode-alist '("\\.jsx\\'" . web-mode))
+
+
+(use-package web-mode
+  :mode (("\\.html?\\'" . web-mode)
+         ("\\.css\\'"   . web-mode)
+         ("\\.js\\'"   . web-mode)
+         ("\\.jsx?\\'"  . web-mode))
+  :config
+  (setq web-mode-markup-indent-offset 2)
+  (setq web-mode-code-indent-offset 2)
+  (setq web-mode-css-indent-offset 2)
+  (setq web-mode-content-types-alist '(("jsx" . "\\.js[x]?\\'"))))
+
+
+
+(defun setup-tide-mode()
+  (interactive)
+  (tide-setup)
+  (flycheck-mode +1)
+  (setq flycheck-check-syntax-automatically '(save mode-enabled))
+  (tide-hl-identifier-mode +1)
+  (company-mode +1))
+
+(use-package! tide
+  :ensure t
+  :after (web-mode)
+  :hook (web-mode . prettier-js-mode))
+
+
+(use-package! typescript-mode
+  :init
+  (define-derived-mode typescript-tsx-mode typescript-mode "typescript-tsx")
+  (add-to-list 'auto-mode-alist (cons (rx ".tsx" string-end) #'typescript-tsx-mode))
+  )
+
+(add-hook! typescript-tsx-mode 'lsp!)
+
+(use-package! tree-sitter
+  :hook (prog-mode . turn-on-tree-sitter-mode)
+  :hook (tree-sitter-after-on . tree-sitter-hl-mode)
+  :config
+  (require 'tree-sitter-langs)
+
+  (tree-sitter-require 'tsx)
+  (add-to-list 'tree-sitter-major-mode-language-alist '(typescript-tsx-mode . tsx))
+
+  ;; This makes every node a link to a section of code
+  (setq tree-sitter-debug-jump-buttons t
+        ;; and this highlights the entire sub tree in your code
+        tree-sitter-debug-highlight-jump-region t))
+
+(use-package! flycheck :ensure)
+  (use-package! rustic
+    :ensure
+    :bind (:map rustic-mode-map
+                ("M-j" . lsp-ui-imenu)
+                ("M-?" . lsp-find-references)
+                ("C-c C-c l" . flycheck-list-errors)
+                ("C-c C-c a" . lsp-execute-code-action)
+                ("C-c C-c r" . lsp-rename)
+                ("C-c C-c q" . lsp-workspace-restart)
+                ("C-c C-c Q" . lsp-workspace-shutdown)
+                ("C-c C-c s" . lsp-rust-analyzer-status))
+    :config
+    ;; uncomment for less flashiness
+    ;; (setq lsp-eldoc-hook nil)
+    ;; (setq lsp-enable-symbol-highlighting nil)
+    ;; (setq lsp-signature-auto-activate nil)
+
+    ;; comment to disable rustfmt on save
+    (setq rustic-format-on-save t)
+    (add-hook 'rustic-mode-hook 'rk/rustic-mode-hook))
+
+  (defun rk/rustic-mode-hook ()
+    ;; so that run C-c C-c C-r works without having to confirm, but don't try to
+    ;; save rust buffers that are not file visiting. Once
+    ;; https://github.com/brotzeit/rustic/issues/253 has been resolved this should
+    ;; no longer be necessary.
+    (when buffer-file-name
+      (setq-local buffer-save-without-query t)))

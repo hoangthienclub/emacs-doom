@@ -4,7 +4,7 @@
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
  '(package-selected-packages
-   '(rjsx-mode lsp-ui git-gutter-fringe+ git-gutter-fringe prettier prettier-js lsp-treemacs treemacs-icons-dired treemacs-all-the-icons treemacs-evil treemacs-projectile treemacs projectile))
+   '(tree-sitter-langs rjsx-mode lsp-ui git-gutter-fringe+ git-gutter-fringe prettier prettier-js lsp-treemacs treemacs-icons-dired treemacs-all-the-icons treemacs-evil treemacs-projectile treemacs projectile))
  '(warning-suppress-types '((before-save-hook))))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.

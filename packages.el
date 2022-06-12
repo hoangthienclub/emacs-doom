@@ -53,3 +53,5 @@
 (package! company)
 (package! js2-mode)
 (package! json-mode)
+(package! engine-mode)
+(package! tree-sitter)
