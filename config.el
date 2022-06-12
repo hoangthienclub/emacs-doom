@@ -1,4 +1,4 @@
-;;; $DOOMDIR/config.el -*- lexical-binding: t; -*-
+
 
 ;; Place your private configuration here! Remember, you do not need to run 'doom
 ;; sync' after modifying this file!
@@ -108,18 +108,19 @@
 
 (defun setup-tide-mode ()
   (interactive)
-  ;;  (setq tide-tsserver-process-environment '("TSS_LOG=-level verbose -file /tmp/tss.log"))
   (tide-setup)
-  (if (file-exists-p (concat tide-project-root "node_modules/typescript/bin/tsserver"))
-    (setq tide-tsserver-executable "node_modules/typescript/bin/tsserver"))
   (flycheck-mode +1)
   (setq flycheck-check-syntax-automatically '(save mode-enabled))
   (eldoc-mode +1)
   (tide-hl-identifier-mode +1)
-  (setq tide-format-options '(:indentSize 2 :tabSize 2 :insertSpaceAfterFunctionKeywordForAnonymousFunctions t :placeOpenBraceOnNewLineForFunctions nil))
+   (setq tide-format-options '(:indentSize 2 :tabSize 2 :insertSpaceAfterFunctionKeywordForAnonymousFunctions t :placeOpenBraceOnNewLineForFunctions nil))
   (local-set-key (kbd "C-c d") 'tide-documentation-at-point)
   (company-mode +1)
-  (setq company-minimum-prefix-length 1))
+  (setq company-minimum-prefix-length 1)
+)
+
+(add-hook 'js2-mode-hook #'setup-tide-mode)
+
 
 (require 'use-package)
 (use-package tide
@@ -194,6 +195,20 @@
 (add-to-list 'default-frame-alist '(foreground-color . "#E0DFDB"))
 (add-to-list 'default-frame-alist '(background-color . "#102372"))
 
+;;git-gutter
+(use-package git-gutter
+  :hook (prog-mode . git-gutter-mode)
+  :config
+  (setq git-gutter:update-interval 0.02))
+
+
+(use-package git-gutter-fringe
+  :config
+  (define-fringe-bitmap 'git-gutter-fr:added [224] nil nil '(center repeated))
+  (define-fringe-bitmap 'git-gutter-fr:modified [224] nil nil '(center repeated))
+  (define-fringe-bitmap 'git-gutter-fr:deleted [128 192 224 240] nil nil 'bottom))
+
+;;map key
 (map!
 	  :nv    "-"     #'evil-window-decrease-width
 		:nv    "+"     #'evil-window-increase-width
