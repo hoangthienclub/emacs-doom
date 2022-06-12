@@ -183,7 +183,7 @@
 
 (map!
  ;; prettier-js
-		"c-c f f"      #'prettier-js
-		"c-c f l"      #'flycheck-list-errors
+		"C-c f f"      #'prettier-js
+		"C-c f l"      #'flycheck-list-errors
 )
 
