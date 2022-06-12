@@ -75,3 +75,108 @@
 ;; You can also try 'gd' (or 'C-c c d') to jump to their definition and see how
 ;; they are implemented.
 (add-to-list 'initial-frame-alist '(fullscreen . maximized))
+
+(require 'package)
+(setq package-check-signature  nil)
+(package-initialize)
+(add-to-list 'package-archives '("gnu"          . "https://elpa.gnu.org/packages/") t)
+(add-to-list 'package-archives '("melpa"        . "https://melpa.org/packages/") t)
+(add-to-list 'package-archives '("melpa-stable" . "https://stable.melpa.org/packages/") t)
+
+;;disable splash screen and startup message
+
+(show-paren-mode t)
+(setq inhibit-startup-message t)
+(setq initial-scratch-message nil)
+(custom-set-variables
+ ;; custom-set-variables was added by Custom.
+ ;; If you edit it by hand, you could mess it up, so be careful.
+ ;; Your init file should contain only one such instance.
+ ;; If there is more than one, they won't work right.
+ '(package-selected-packages (quote (json-mode js2-mode company web-mode tide flycheck))))
+(custom-set-faces
+ ;; custom-set-faces was added by Custom.
+ ;; If you edit it by hand, you could mess it up, so be careful.
+ ;; Your init file should contain only one such instance.
+ ;; If there is more than one, they won't work right.
+ )
+
+
+;; /home/mihamina/node_modules/.bin
+(add-to-list 'exec-path "/home/mihamina/node_modules/.bin")
+(add-to-list 'exec-path "/home/mihamina/Apps/node-v12.18.0-linux-x64/bin")
+
+(defun setup-tide-mode ()
+  (interactive)
+  ;;  (setq tide-tsserver-process-environment '("TSS_LOG=-level verbose -file /tmp/tss.log"))
+  (tide-setup)
+  (if (file-exists-p (concat tide-project-root "node_modules/typescript/bin/tsserver"))
+    (setq tide-tsserver-executable "node_modules/typescript/bin/tsserver"))
+  (flycheck-mode +1)
+  (setq flycheck-check-syntax-automatically '(save mode-enabled))
+  (eldoc-mode +1)
+  (tide-hl-identifier-mode +1)
+  (setq tide-format-options '(:indentSize 2 :tabSize 2 :insertSpaceAfterFunctionKeywordForAnonymousFunctions t :placeOpenBraceOnNewLineForFunctions nil))
+  (local-set-key (kbd "C-c d") 'tide-documentation-at-point)
+  (company-mode +1)
+  (setq company-minimum-prefix-length 1))
+
+(require 'use-package)
+(use-package tide
+  :ensure t
+  :config
+  (progn
+    (company-mode +1)
+    ;; aligns annotation to the right hand side
+    (setq company-tooltip-align-annotations t)
+    (add-hook 'typescript-mode-hook #'setup-tide-mode)
+    (add-to-list 'auto-mode-alist '("\\.ts\\'" . typescript-mode))
+  ))
+
+;; use web-mode + tide-mode for javascript instead
+(use-package js2-mode
+  :ensure t
+  :config
+  (progn
+    (add-hook 'js2-mode-hook #'setup-tide-mode)
+    ;; configure javascript-tide checker to run after your default javascript checker
+    (setq js2-basic-offset 2)
+    (flycheck-add-next-checker 'javascript-eslint 'javascript-tide 'append)
+    (add-to-list 'interpreter-mode-alist '("node" . js2-mode))
+    (add-to-list 'auto-mode-alist '("\\.js\\'" . js2-mode))))
+
+;; (add-to-list 'interpreter-mode-alist '("node" . js2-mode))
+
+(use-package json-mode
+  :ensure t
+  :config
+  (progn
+    (flycheck-add-mode 'json-jsonlint 'json-mode)
+    (add-hook 'json-mode-hook 'flycheck-mode)
+    (setq js-indent-level 2)
+    (add-to-list 'auto-mode-alist '("\\.json" . json-mode))))
+
+(use-package web-mode
+  :ensure t
+  :config
+  (progn
+    (add-to-list 'auto-mode-alist '("\\.tsx\\'" . web-mode))
+    (add-to-list 'auto-mode-alist '("\\.js"     . web-mode))
+    (add-to-list 'auto-mode-alist '("\\.html"   . web-mode))
+    ;; this magic incantation fixes highlighting of jsx syntax in .js files
+    (setq web-mode-content-types-alist
+          '(("jsx" . "\\.js[x]?\\'")))
+    (add-hook 'web-mode-hook
+              (lambda ()
+                (setq web-mode-code-indent-offset 2)
+                (when (string-equal "tsx" (file-name-extension buffer-file-name))
+                  (setup-tide-mode))
+                (when (string-equal "jsx" (file-name-extension buffer-file-name))
+                  (setup-tide-mode))
+                (when (string-equal "js" (file-name-extension buffer-file-name))
+                  (progn
+                    (setup-tide-mode)
+                    (with-eval-after-load 'flycheck
+                      (flycheck-add-mode 'typescript-tslint 'web-mode)
+                      (flycheck-add-mode 'javascript-tide 'web-mode))))))
+    ))

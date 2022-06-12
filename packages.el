@@ -47,4 +47,9 @@
 ;; ...Or *all* packages (NOT RECOMMENDED; will likely break things)
 ;(unpin! t)
 
-;(package! rjsx-mode)
+(package! web-mode)
+(package! tide)
+(package! flycheck)
+(package! company)
+(package! js2-mode)
+(package! json-mode)
