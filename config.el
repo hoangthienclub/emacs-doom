@@ -74,7 +74,7 @@
 ;;
 ;; You can also try 'gd' (or 'C-c c d') to jump to their definition and see how
 ;; they are implemented.
-(add-to-list 'initial-frame-alist '(fullscreen . maximized))
+;;(add-to-list 'initial-frame-alist '(fullscreen . maximized))
 
 (require 'package)
 (setq package-check-signature  nil)
@@ -179,4 +179,11 @@
                     (with-eval-after-load 'flycheck
                       (flycheck-add-mode 'typescript-tslint 'web-mode)
                       (flycheck-add-mode 'javascript-tide 'web-mode))))))
-    ))
+))
+
+(map!
+ ;; prettier-js
+		"c-c f f"      #'prettier-js
+		"c-c f l"      #'flycheck-list-errors
+)
+
