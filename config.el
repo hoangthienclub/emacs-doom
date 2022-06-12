@@ -74,7 +74,6 @@
 ;;
 ;; You can also try 'gd' (or 'C-c c d') to jump to their definition and see how
 ;; they are implemented.
-;;(add-to-list 'initial-frame-alist '(fullscreen . maximized))
 
 (require 'package)
 (setq package-check-signature  nil)
@@ -106,81 +105,6 @@
 (add-to-list 'exec-path "/home/mihamina/node_modules/.bin")
 (add-to-list 'exec-path "/home/mihamina/Apps/node-v12.18.0-linux-x64/bin")
 
-(defun setup-tide-mode ()
-  (interactive)
-  (tide-setup)
-  (flycheck-mode +1)
-  (setq flycheck-check-syntax-automatically '(save mode-enabled))
-  (eldoc-mode +1)
-  (tide-hl-identifier-mode +1)
-   (setq tide-format-options '(:indentSize 2 :tabSize 2 :insertSpaceAfterFunctionKeywordForAnonymousFunctions t :placeOpenBraceOnNewLineForFunctions nil))
-  (local-set-key (kbd "C-c d") 'tide-documentation-at-point)
-  (company-mode +1)
-  (setq company-minimum-prefix-length 1)
-)
-
-(add-hook 'js2-mode-hook #'setup-tide-mode)
-
-
-(require 'use-package)
-(use-package tide
-  :ensure t
-  :config
-  (progn
-    (company-mode +1)
-    ;; aligns annotation to the right hand side
-    (setq company-tooltip-align-annotations t)
-    (add-hook 'typescript-mode-hook #'setup-tide-mode)
-    (add-to-list 'auto-mode-alist '("\\.ts\\'" . typescript-mode))
-  ))
-
-;; use web-mode + tide-mode for javascript instead
-(use-package js2-mode
-  :ensure t
-  :config
-  (progn
-    (add-hook 'js2-mode-hook #'setup-tide-mode)
-    ;; configure javascript-tide checker to run after your default javascript checker
-    (setq js2-basic-offset 2)
-    (flycheck-add-next-checker 'javascript-eslint 'javascript-tide 'append)
-    (add-to-list 'interpreter-mode-alist '("node" . js2-mode))
-    (add-to-list 'auto-mode-alist '("\\.js\\'" . js2-mode))))
-
-;; (add-to-list 'interpreter-mode-alist '("node" . js2-mode))
-
-(use-package json-mode
-  :ensure t
-  :config
-  (progn
-    (flycheck-add-mode 'json-jsonlint 'json-mode)
-    (add-hook 'json-mode-hook 'flycheck-mode)
-    (setq js-indent-level 2)
-    (add-to-list 'auto-mode-alist '("\\.json" . json-mode))))
-
-(use-package web-mode
-  :ensure t
-  :config
-  (progn
-    (add-to-list 'auto-mode-alist '("\\.tsx\\'" . web-mode))
-    (add-to-list 'auto-mode-alist '("\\.js"     . web-mode))
-    (add-to-list 'auto-mode-alist '("\\.html"   . web-mode))
-    ;; this magic incantation fixes highlighting of jsx syntax in .js files
-    (setq web-mode-content-types-alist
-          '(("jsx" . "\\.js[x]?\\'")))
-    (add-hook 'web-mode-hook
-              (lambda ()
-                (setq web-mode-code-indent-offset 2)
-                (when (string-equal "tsx" (file-name-extension buffer-file-name))
-                  (setup-tide-mode))
-                (when (string-equal "jsx" (file-name-extension buffer-file-name))
-                  (setup-tide-mode))
-                (when (string-equal "js" (file-name-extension buffer-file-name))
-                  (progn
-                    (setup-tide-mode)
-                    (with-eval-after-load 'flycheck
-                      (flycheck-add-mode 'typescript-tslint 'web-mode)
-                      (flycheck-add-mode 'javascript-tide 'web-mode))))))
-))
 
 (require 'prettier-js)
 (add-hook 'js2-mode-hook 'prettier-js-mode)
@@ -197,9 +121,9 @@
 
 ;;window size
 (add-to-list 'default-frame-alist '(height . 60))
-(add-to-list 'default-frame-alist '(width . 210)) 
-(add-to-list 'default-frame-alist '(top . 250)) 
-(add-to-list 'default-frame-alist '(left . 550)) 
+(add-to-list 'default-frame-alist '(width . 210))
+(add-to-list 'default-frame-alist '(top . 250))
+(add-to-list 'default-frame-alist '(left . 550))
 
 ;;git-gutter
 (use-package git-gutter
