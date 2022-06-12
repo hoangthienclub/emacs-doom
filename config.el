@@ -106,8 +106,6 @@
 (add-to-list 'exec-path "/home/mihamina/node_modules/.bin")
 (add-to-list 'exec-path "/home/mihamina/Apps/node-v12.18.0-linux-x64/bin")
 
-(add-to-list 'after-make-frame-functions #'ct/frame-center)
-
 (defun setup-tide-mode ()
   (interactive)
   (tide-setup)
@@ -196,6 +194,12 @@
 (set-frame-font "Monaco" nil t)
 (add-to-list 'default-frame-alist '(foreground-color . "#E0DFDB"))
 (add-to-list 'default-frame-alist '(background-color . "#102372"))
+
+;;window size
+(add-to-list 'default-frame-alist '(height . 60))
+(add-to-list 'default-frame-alist '(width . 210)) 
+(add-to-list 'default-frame-alist '(top . 250)) 
+(add-to-list 'default-frame-alist '(left . 550)) 
 
 ;;git-gutter
 (use-package git-gutter
