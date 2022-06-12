@@ -191,6 +191,9 @@
 
 ;;font
 (set-frame-font "Monaco" nil t)
+(add-to-list 'default-frame-alist '(foreground-color . "#E0DFDB"))
+(add-to-list 'default-frame-alist '(background-color . "#102372"))
+
 (map!
 	  :nv    "-"     #'evil-window-decrease-width
 		:nv    "+"     #'evil-window-increase-width
@@ -202,5 +205,8 @@
 		"C-l"					#'evil-window-right
 		"C-j"					#'evil-window-down
 		"C-k"					#'evil-window-up
+
+		"C-S-v"				#'evil-window-vsplit
+		"C-S-h"				#'evil-window-split
 )
 
