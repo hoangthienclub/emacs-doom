@@ -181,9 +181,26 @@
                       (flycheck-add-mode 'javascript-tide 'web-mode))))))
 ))
 
+(require 'prettier-js)
+(add-hook 'js2-mode-hook 'prettier-js-mode)
+(add-hook 'web-mode-hook 'prettier-js-mode)
+
+;; set transparency
+(set-frame-parameter (selected-frame) 'alpha '(98 98))
+(add-to-list 'default-frame-alist '(alpha 98 98))
+
+;;font
+(set-frame-font "Monaco" nil t)
 (map!
- ;; prettier-js
+	  :nv    "-"     #'evil-window-decrease-width
+		:nv    "+"     #'evil-window-increase-width
+	;; prettier-js
 		"C-c f f"      #'prettier-js
 		"C-c f l"      #'flycheck-list-errors
+;evil:
+		"C-h"					#'evil-window-left
+		"C-l"					#'evil-window-right
+		"C-j"					#'evil-window-down
+		"C-k"					#'evil-window-up
 )
 
