@@ -106,6 +106,8 @@
 (add-to-list 'exec-path "/home/mihamina/node_modules/.bin")
 (add-to-list 'exec-path "/home/mihamina/Apps/node-v12.18.0-linux-x64/bin")
 
+(add-to-list 'after-make-frame-functions #'ct/frame-center)
+
 (defun setup-tide-mode ()
   (interactive)
   (tide-setup)
