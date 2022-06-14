@@ -138,20 +138,6 @@
   (define-fringe-bitmap 'git-gutter-fr:modified [224] nil nil '(center repeated))
   (define-fringe-bitmap 'git-gutter-fr:deleted [128 192 224 240] nil nil 'bottom))
 
-;;map key
-(map!
-	  :nv    "-"     #'evil-window-decrease-width
-		:nv    "+"     #'evil-window-increase-width
-;; prettier-js
-		"C-c f f"      #'prettier-js
-		"C-c f l"      #'flycheck-list-errors
-;;evil:
-		"C-S-v"				#'evil-window-vsplit
-		"C-S-h"				#'evil-window-split
-		:nv 	"]"			#'evil-open-fold
-		:nv 	"["			#'evil-close-fold
-)
-
 (use-package! lsp-mode
   :commands lsp
   :config
@@ -334,4 +320,30 @@
 (with-eval-after-load 'treemacs
   (define-key treemacs-mode-map [mouse-1] #'treemacs-single-click-expand-action))
 
-(treemacs-load-theme "Default")
+
+;;map key
+(map!
+	  :nv    "-"     #'evil-window-decrease-width
+		:nv    "+"     #'evil-window-increase-width
+;; prettier-js
+		"C-c f f"      #'prettier-js
+		"C-c f l"      #'flycheck-list-errors
+;;evil:
+		"C-S-v"				#'evil-window-vsplit
+		"C-S-h"				#'evil-window-split
+		:nv 	"]"			#'evil-open-fold
+		:nv 	"["			#'evil-close-fold
+
+    "C-S-j"          #'move-text-up
+    "C-S-k"          #'move-text-down
+)
+
+(minimap-mode 1)
+;; changing colors
+(custom-set-faces
+  '(minimap-active-region-background
+    ((((background dark)) (:background "#47597E"))
+      (t (:background "#D3D3D3222222")))
+    "Face for the active region in the minimap.
+By default, this is only a different background color."
+    :group 'minimap))
