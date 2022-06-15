@@ -338,7 +338,6 @@
     "C-S-k"          #'move-text-down
 )
 
-(minimap-mode 1)
 ;; changing colors
 (custom-set-faces
   '(minimap-active-region-background
@@ -347,3 +346,7 @@
     "Face for the active region in the minimap.
 By default, this is only a different background color."
     :group 'minimap))
+
+(load-theme 'atom-one-dark t)
+(global-display-line-numbers-mode 1)
+(setq display-line-numbers-type 'relative)
